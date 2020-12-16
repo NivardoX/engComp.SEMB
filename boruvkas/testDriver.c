@@ -1,6 +1,32 @@
+/************************************************************************
+*  
+*  Algoritmo de BORUVKA
+*  __________________
+* 
+* Copyright 2020 Nivardo Alburquerque, Paulo Bernardo
+* 
+* Permission is hereby granted, free of charge, to any person obtaining a copy of 
+* this software and associated documentation files (the "Software"), to deal in the 
+* Software without restriction, including without limitation the rights to use, copy,
+* modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
+* and to permit persons to whom the Software is furnished to do so, subject to the 
+* following conditions:
+* 
+* The above copyright notice and this permission notice shall be included in all copies 
+* or substantial portions of the Software.
+* 
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+* INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+* AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, 
+* DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, 
+* ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*
+*/
+
 //
 // Created by Nivardo and Paulo on 10/12/2020.
 //
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
@@ -21,14 +47,14 @@ int main() {
       6 |   5\   |15
         |      \ |
         2--------3
-            4           */
-//    int vertices = 4;
-//    int matriz_adjacencia2[MaxDim][MaxDim] = {
-//            {0,  10, 6, 5},
-//            {10, 0,  0, 15},
-//            {6,  0,  0, 4},
-//            {5,  15, 4, 0}
-//    };
+   //          4           
+   // int vertices = 4;
+   // int matriz_adjacencia2[MaxDim][MaxDim] = {
+   //         { 0, 10,  6,  5},
+   //         {10,  0,  0, 15},
+   //         { 6,  0,  0,  4},
+   //         { 5, 15,  4,  0}
+   // };
 
     /*  Teste 2   */
 //        int vertices = 9;
@@ -69,7 +95,7 @@ int main() {
 //            {0,  0, 2,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  20, 0,  0},
 //    };
 
-    /*  Teste 4   */
+    // /*  Teste 4   */
      int vertices = 45;
      int matriz_adjacencia2[MaxDim][MaxDim] = {
              {0,   0,   140, 0,   0,   0,   70,  0,   0,   0,   0,   0,   0,   276, 0,   0,   0,   0,   0,   198, 0,   115, 250, 0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   247, 0,   0,   0,   0,   0,   0,   298, 0,   0},

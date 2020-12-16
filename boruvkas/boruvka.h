@@ -146,9 +146,11 @@ int boruvka(int vertices, int matriz_adjacencia_aux[MaxDim][MaxDim], struct Ares
                 agm_peso += arestas[menores_distancias_vertices[i]].peso;
 
                 struct Aresta aresta;
+                
                 aresta.origem = arestas[menores_distancias_vertices[i]].origem;
                 aresta.destino = arestas[menores_distancias_vertices[i]].destino;
                 aresta.peso = arestas[menores_distancias_vertices[i]].peso;
+
                 resposta[resp_index++] = aresta;
 
                 // Une os grupos 1 e 2 e diminui a quantidade de grupos
