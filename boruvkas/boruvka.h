@@ -1,5 +1,5 @@
 //
-// Created by paulo on 15/12/2020.
+// Created by Nivardo and Paulo on 10/12/2020.
 //
 
 #ifndef ENGCOMP_SEMB_BORUVKA_H
@@ -13,33 +13,46 @@
 #define qnt_vertices 45
 
 // ------ STRUCTS ------
-struct Grupo
-{
+struct Grupo {
     int pai, nivel;
 };
 
-struct Aresta
-{
+struct Aresta {
     int origem, destino, peso;
 };
 
 // ----- PROTOTIPOS ------
 
 int encontrar_raiz_grupo(struct Grupo grupos[qnt_vertices], int i);
+
 void unir_grupos(struct Grupo grupos[], int x, int y);
 
 int boruvka(int vertices, int [MaxDim][MaxDim], struct Aresta[MaxDim]);
 
 // ----- GLOBAIS ------
 
+// Matriz adjacencia MaxDim x MaxDim
 int matriz_adjacencia[MaxDim][MaxDim];
-int qnt_arestas = 2025;
+
+// Variável que guarda o máximo de arestas possíveis
+int qnt_arestas = MaxDim * MaxDim;
 
 //----------------------
 
+/*
+  Recebe a quantidade de vertices, o grafo e a AGM vazia que será a resposta.
+  O algoritmo verifica se o número de vertices é igual ou menor que a quantidade
+  máxima possível, caso não, retorna -1. Que significa  que não foi possivel encontar
+  a AGM.
+  Caso o grafo seja desconecto ou não tenha a AGM, o algoritmo retornará -1 também.
+  O algoritmo procura a AGM e retorna o valor do peso da AGM e a resposta de forma impura.
 
-int boruvka(int vertices, int matriz_adjacencia_aux[MaxDim][MaxDim], struct Aresta resposta[MaxDim])
-{
+  Parâmetros:
+  vertices: tipo inteiro que guarda a quantidade de vertices presentes no grafo
+  matriz_adjacencia_aux: matriz de inteiros MaxDim x MaxDim que representa o grafo
+  resposta: vetor de struct Aresta de tamanho MaxDim que guardará a resposta da AGM
+*/
+int boruvka(int vertices, int matriz_adjacencia_aux[MaxDim][MaxDim], struct Aresta resposta[MaxDim]) {
     if (vertices > MaxDim) {
         return -1;
     }
@@ -48,25 +61,26 @@ int boruvka(int vertices, int matriz_adjacencia_aux[MaxDim][MaxDim], struct Ares
     struct Aresta arestas[qnt_arestas];
     struct Grupo grupos[qnt_vertices];
 
-
-
+    // Guarda o index da proxima aresta a ser adicionada na AGM resposta
     int resp_index = 0;
+    // Contador de iterações aceitáveis - Evitando loop infinito em grafos desconectos
     int iteracoes = 0;
-    int qnt_grupos = vertices - 1;
+    // Quantidade de grupos atuais, inicia com o número de vertices pois todos os vertices na primeira iteração são grupos individuais
+    int qnt_grupos = vertices;
+    // Somador do peso da AGM
     int agm_peso = 0;
+    // Guarda a quantidade de arestas presentes no grafo
     int qnt_arestas_aux = 0;
 
-    // Procura todas as arestas da matriz de adjacencia e salva no array
-    int i,j;
+    // Auxiliares nos loops
+    int i, j;
 
-    for(i=0; i<vertices; i++)
-    {
+    // Procura todas as arestas da matriz de adjacencia e salva no array
+    for (i = 0; i < vertices; i++) {
         // j <= i , pois temos um grafo simetrico
-        for(j=0; j<=i; j++)
-        {
+        for (j = 0; j <= i; j++) {
             matriz_adjacencia[i][j] = matriz_adjacencia_aux[i][j];
-            if(matriz_adjacencia[i][j])
-            {
+            if (matriz_adjacencia[i][j]) {
                 struct Aresta aresta;
                 aresta.origem = i;
                 aresta.destino = j;
@@ -79,16 +93,15 @@ int boruvka(int vertices, int matriz_adjacencia_aux[MaxDim][MaxDim], struct Ares
 
 
     // Inicializa todos os grupos e seta a menor distancia deles como -1
-    for (int v = 0; v < vertices; ++v)
-    {
+    for (i = 0; i < vertices; ++i) {
         struct Grupo grupo;
         grupo.nivel = 0;
-        grupo.pai = v;
-        grupos[v] = grupo;
+        grupo.pai = i;
+        grupos[i] = grupo;
     }
 
     // Enquanto houver mais de um grupo de arestas
-    while(qnt_grupos > 0){
+    while (qnt_grupos > 1) {
         if (iteracoes == vertices) {
             return -1;
         } else {
@@ -96,14 +109,12 @@ int boruvka(int vertices, int matriz_adjacencia_aux[MaxDim][MaxDim], struct Ares
         }
 
         // Seta todas as os vertices com menores distancias como -1
-        for (int i = 0; i < vertices; i++)
-        {
+        for (i = 0; i < vertices; i++) {
             menores_distancias_vertices[i] = -1;
         }
 
 
-        for (int i=0; i < qnt_arestas_aux; i++)
-        {
+        for (i = 0; i < qnt_arestas_aux; i++) {
 
             int raiz_grupo1 = encontrar_raiz_grupo(grupos, arestas[i].origem);
             int raiz_grupo2 = encontrar_raiz_grupo(grupos, arestas[i].destino);
@@ -112,8 +123,7 @@ int boruvka(int vertices, int matriz_adjacencia_aux[MaxDim][MaxDim], struct Ares
                 continue;
 
                 // Checa se o peso da aresta atual eh menor que o menor peso dos grupos
-            else
-            {
+            else {
                 if (menores_distancias_vertices[raiz_grupo1] == -1 ||
                     arestas[menores_distancias_vertices[raiz_grupo1]].peso > arestas[i].peso)
                     menores_distancias_vertices[raiz_grupo1] = i;
@@ -125,11 +135,9 @@ int boruvka(int vertices, int matriz_adjacencia_aux[MaxDim][MaxDim], struct Ares
         }
 
 
-        for (int i=0; i < vertices; i++)
-        {
+        for (i = 0; i < vertices; i++) {
             // Checa se a menor distacia do grupo ja existe
-            if (menores_distancias_vertices[i] != -1)
-            {
+            if (menores_distancias_vertices[i] != -1) {
                 int raiz_grupo1 = encontrar_raiz_grupo(grupos, arestas[menores_distancias_vertices[i]].origem);
                 int raiz_grupo2 = encontrar_raiz_grupo(grupos, arestas[menores_distancias_vertices[i]].destino);
 
@@ -155,8 +163,7 @@ int boruvka(int vertices, int matriz_adjacencia_aux[MaxDim][MaxDim], struct Ares
 }
 
 // Funcao para realizar um Find em um grupo(arvore), ela encontra a raiz da arvore
-int encontrar_raiz_grupo(struct Grupo grupos[qnt_vertices], int i)
-{
+int encontrar_raiz_grupo(struct Grupo grupos[qnt_vertices], int i) {
 
     int lista_aux[qnt_vertices];
     int index = 0;
@@ -176,12 +183,10 @@ int encontrar_raiz_grupo(struct Grupo grupos[qnt_vertices], int i)
 }
 
 // Funcao utilitaria para realizar uma Union em dois grupos(arvores), ela eh feita por nivel
-void unir_grupos(struct Grupo grupos[], int x, int y)
-{
+void unir_grupos(struct Grupo grupos[], int x, int y) {
 
     int raiz_grupo_x = encontrar_raiz_grupo(grupos, x);
     int raiz_grupo_y = encontrar_raiz_grupo(grupos, y);
-
 
 
     if (grupos[raiz_grupo_x].nivel < grupos[raiz_grupo_y].nivel)
@@ -190,9 +195,8 @@ void unir_grupos(struct Grupo grupos[], int x, int y)
     else if (grupos[raiz_grupo_x].nivel > grupos[raiz_grupo_y].nivel)
         grupos[raiz_grupo_y].pai = raiz_grupo_x;
 
-        // se estiverem no mesmo nivel escolhe um grupo aleatorio para ser o pai
-    else
-    {
+    // se estiverem no mesmo nivel escolhe um grupo aleatorio para ser o pai
+    else {
         grupos[raiz_grupo_y].pai = raiz_grupo_x;
         grupos[raiz_grupo_x].nivel++;
     }

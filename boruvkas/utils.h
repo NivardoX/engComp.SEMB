@@ -1,5 +1,5 @@
 //
-// Created by paulo on 15/12/2020.
+// Created by Nivardo and Paulo on 10/12/2020.
 //
 
 #ifndef ENGCOMP_SEMB_UTILS_H
