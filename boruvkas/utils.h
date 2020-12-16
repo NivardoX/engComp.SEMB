@@ -1,5 +1,5 @@
 //
-// Created by paulo on 15/12/2020.
+// Created by Nivardo and Paulo on 10/12/2020.
 //
 
 #ifndef ENGCOMP_SEMB_UTILS_H
@@ -12,7 +12,7 @@ void printar_grafo(int n, int [n][n]);
 void print_array(int *lista,int n);
 
 // Funcao utilitaria para printar a matriz de adjacencia do grafo
-void printar_grafo(int n, int grafo[n][n])
+void printar_grafo(int n, int grafo[MaxDim][MaxDim])
 {
     int i,j;
     printf("\nGRAFO: Matriz de Adjacencia\n");
