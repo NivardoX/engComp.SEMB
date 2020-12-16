@@ -25,10 +25,6 @@ struct Aresta
 
 // ----- PROTOTIPOS ------
 
-void gera_grafo_simetrico(int);
-void printar_grafo(int n, int [n][n]);
-
-void print_array(int *lista,int n);
 int encontrar_raiz_grupo(struct Grupo grupos[qnt_vertices], int i);
 void unir_grupos(struct Grupo grupos[], int x, int y);
 
@@ -44,13 +40,18 @@ int qnt_arestas = 2025;
 
 int boruvka(int vertices, int matriz_adjacencia_aux[MaxDim][MaxDim], struct Aresta resposta[MaxDim])
 {
+    if (vertices > MaxDim) {
+        return -1;
+    }
     // Inicializacao de variaveis auxiliares
     int menores_distancias_vertices[qnt_vertices];
     struct Aresta arestas[qnt_arestas];
     struct Grupo grupos[qnt_vertices];
+
+
+
     int resp_index = 0;
-
-
+    int interations = 0;
     int qnt_grupos = vertices - 1;
     int agm_peso = 0;
     int qnt_arestas_aux = 0;
@@ -87,7 +88,12 @@ int boruvka(int vertices, int matriz_adjacencia_aux[MaxDim][MaxDim], struct Ares
     }
 
     // Enquanto houver mais de um grupo de arestas
-    while(qnt_grupos > 1){
+    while(qnt_grupos > 0){
+        if (interations == vertices) {
+            return -1;
+        } else {
+            interations++;
+        }
 
         // Seta todas as os vertices com menores distancias como -1
         for (int i = 0; i < vertices; i++)
@@ -192,18 +198,4 @@ void unir_grupos(struct Grupo grupos[], int x, int y)
     }
 }
 
-
-// Funcao utilitaria para printar listas
-void print_array(int *lista,int n)
-{
-    int i;
-    printf("\n Lista:\n");
-
-    for(i=0; i<n; i++)
-    {
-        printf("%d ",lista[i]);
-    }
-    printf("\n");
-
-}
 #endif //ENGCOMP_SEMB_BORUVKA_H

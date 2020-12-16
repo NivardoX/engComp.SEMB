@@ -9,6 +9,7 @@
 
 void gera_grafo_simetrico(int);
 void printar_grafo(int n, int [n][n]);
+void print_array(int *lista,int n);
 
 // Funcao utilitaria para printar a matriz de adjacencia do grafo
 void printar_grafo(int n, int grafo[n][n])
@@ -24,6 +25,29 @@ void printar_grafo(int n, int grafo[n][n])
         printf("\n");
     }
     printf("\n");
+}
+
+void printar_grafo_formatted(int n, int grafo[n][n])
+{
+    int i,j;
+    printf("\nGRAFO: Matriz de Adjacencia\n {");
+    for(i=0; i<n; i++)
+    {
+
+        printf("{");
+        for(j=0; j<n; j++)
+        {
+            if (j != n-1)
+                printf("%d, ",grafo[i][j]);
+            else
+                printf("%d ",grafo[i][j]);
+        }
+        if (i != n -1)
+            printf("},\n");
+        else
+            printf("}\n");
+    }
+    printf("};\n");
 }
 
 
@@ -57,6 +81,20 @@ void gera_grafo_simetrico(int n)
 
         }
     }
+
+}
+
+// Funcao utilitaria para printar listas
+void print_array(int *lista,int n)
+{
+    int i;
+    printf("\n Lista:\n");
+
+    for(i=0; i<n; i++)
+    {
+        printf("%d ",lista[i]);
+    }
+    printf("\n");
 
 }
 
