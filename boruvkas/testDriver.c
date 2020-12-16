@@ -24,7 +24,9 @@
 */
 
 //
-// Created by Nivardo and Paulo on 10/12/2020.
+// Created for a college projetct
+// Course: Sistemas Embarcados @ IFCE - Instituto Federal de Educação, Ciência e Tecnologia do Ceará
+// Target Platform: Linux
 //
 
 #include <stdlib.h>

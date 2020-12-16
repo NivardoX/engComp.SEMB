@@ -1,5 +1,32 @@
+/************************************************************************
+*
+*  Algoritmo de BORUVKA
+*  __________________
+*
+* Copyright 2020 Nivardo Alburquerque, Paulo Bernardo
+*
+* Permission is hereby granted, free of charge, to any person obtaining a copy of
+* this software and associated documentation files (the "Software"), to deal in the
+* Software without restriction, including without limitation the rights to use, copy,
+* modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
+* and to permit persons to whom the Software is furnished to do so, subject to the
+* following conditions:
+*
+* The above copyright notice and this permission notice shall be included in all copies
+* or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+* INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+* AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+* DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+* ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*
+*/
+
 //
-// Created by Nivardo and Paulo on 10/12/2020.
+// Created for a college projetct
+// Course: Sistemas Embarcados @ IFCE - Instituto Federal de Educação, Ciência e Tecnologia do Ceará
+// Target Platform: Linux
 //
 
 #ifndef ENGCOMP_SEMB_BORUVKA_H
@@ -53,6 +80,7 @@ int qnt_arestas = MaxDim * MaxDim;
   resposta: vetor de struct Aresta de tamanho MaxDim que guardará a resposta da AGM
 */
 int boruvka(int vertices, int matriz_adjacencia_aux[MaxDim][MaxDim], struct Aresta resposta[MaxDim]) {
+    // Verifica se o valor do vertices é maior que o tamanho máximo
     if (vertices > MaxDim) {
         return -1;
     }
@@ -102,6 +130,7 @@ int boruvka(int vertices, int matriz_adjacencia_aux[MaxDim][MaxDim], struct Ares
 
     // Enquanto houver mais de um grupo de arestas
     while (qnt_grupos > 1) {
+        // Verifica se o número de iterações é igual ao vertice, o que segnifica que o AGM não será mais encontrada.
         if (iteracoes == vertices) {
             return -1;
         } else {
@@ -122,7 +151,7 @@ int boruvka(int vertices, int matriz_adjacencia_aux[MaxDim][MaxDim], struct Ares
             if (raiz_grupo1 == raiz_grupo2)
                 continue;
 
-                // Checa se o peso da aresta atual eh menor que o menor peso dos grupos
+            // Checa se o peso da aresta atual eh menor que o menor peso dos grupos
             else {
                 if (menores_distancias_vertices[raiz_grupo1] == -1 ||
                     arestas[menores_distancias_vertices[raiz_grupo1]].peso > arestas[i].peso)
@@ -141,10 +170,14 @@ int boruvka(int vertices, int matriz_adjacencia_aux[MaxDim][MaxDim], struct Ares
                 int raiz_grupo1 = encontrar_raiz_grupo(grupos, arestas[menores_distancias_vertices[i]].origem);
                 int raiz_grupo2 = encontrar_raiz_grupo(grupos, arestas[menores_distancias_vertices[i]].destino);
 
+                // Está no mesmo subgrafo, não precisa fazer nada
                 if (raiz_grupo1 == raiz_grupo2)
                     continue;
+
+                // Adiciona peso da aresta encontrada no peso da AGM
                 agm_peso += arestas[menores_distancias_vertices[i]].peso;
 
+                // Salva aresta encontrada na resposta
                 struct Aresta aresta;
                 
                 aresta.origem = arestas[menores_distancias_vertices[i]].origem;
