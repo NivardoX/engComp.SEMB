@@ -35,8 +35,8 @@
 
 #include <time.h>
 
-#define MaxDim 4
-#define qnt_vertices 4
+#define MaxDim 10
+#define qnt_vertices 10
 
 // ------ STRUCTS ------
 struct Grupo {
@@ -257,34 +257,42 @@ void printar_grafo(int n, int grafo[MaxDim][MaxDim]) {
 }
 
 void lerMatriz() {
-    Serial.println("Digite todos os items da matriz separados por quebra de linha");
-    int i, j, item;
-    int values[MaxDim * MaxDim];
-    int qntLidos = 0;
 
-    // Limpa o buffer da serial
+    int i, j, item, ordem_matriz;
+    int values[MaxDim * MaxDim] = {0};
+    int qnt_lidos = 0;
+    
+   // Limpa o buffer da serial
     while (Serial.available()) Serial.read();
 
-    while (1) {
+    Serial.println("Digite a ordem da matriz");
+    while(!Serial.available());
+    ordem_matriz = Serial.parseInt();
 
-        if (qntLidos == MaxDim * MaxDim) {
+    while (Serial.available()) Serial.read();
+    Serial.println("Digite todos os items da matriz separados por quebra de linha");
+
+
+    while (1) {
+        if (qnt_lidos == ordem_matriz * ordem_matriz) {
             break;
         }
         if (Serial.available() > 0) {
             item = Serial.parseInt();
-            values[qntLidos++] = item;
+            values[qnt_lidos++] = item;
             Serial.print(".");
         }
     }
 
-    for (i = 0; i < MaxDim; i++) {
-        for (j = 0; j < MaxDim; j++) {
-            matriz_adjacencia[i][j] = values[(MaxDim * i) + j];
+    for (i = 0; i < ordem_matriz; i++) {
+        for (j = 0; j < ordem_matriz; j++) {
+            matriz_adjacencia[i][j] = values[(ordem_matriz * i) + j];
         }
     }
     Serial.println("A leitura da matriz foi finalizada\n");
 
     feito = 0;
+    tamanho_matriz = ordem_matriz;
 }
 
 void setup() {
@@ -403,7 +411,7 @@ void loop() {
 
         // Exibindo o valores encontrados
         Serial.println("AGM:\n");
-        for (int v = 0; v < MaxDim - 1; ++v) {
+        for (int v = 0; v < tamanho_matriz - 1; ++v) {
             Serial.print(resposta[v].origem);
             Serial.print(" --> ");
             Serial.print(resposta[v].destino);
