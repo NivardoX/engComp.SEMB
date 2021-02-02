@@ -1,27 +1,27 @@
 /************************************************************************
-*
-*  Algoritmo de BORUVKA
-*  __________________
-*
-* Copyright 2020 Nivardo Alburquerque, Paulo Bernardo
-*
-* Permission is hereby granted, free of charge, to any person obtaining a copy of
-* this software and associated documentation files (the "Software"), to deal in the
-* Software without restriction, including without limitation the rights to use, copy,
-* modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
-* and to permit persons to whom the Software is furnished to do so, subject to the
-* following conditions:
-*
-* The above copyright notice and this permission notice shall be included in all copies
-* or substantial portions of the Software.
-*
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
-* INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
-* AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-* DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
-* ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*
-*/
+ *
+ *  Algoritmo de BORUVKA
+ *  __________________
+ *
+ * Copyright 2020 Nivardo Alburquerque, Paulo Bernardo
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of
+ * this software and associated documentation files (the "Software"), to deal in the
+ * Software without restriction, including without limitation the rights to use, copy,
+ * modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
+ * and to permit persons to whom the Software is furnished to do so, subject to the
+ * following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies
+ * or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+ * AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
 
 //
 // Created for a college projetct
@@ -30,10 +30,12 @@
 //
 
 #include <stdlib.h>
+
 #include <stdio.h>
+
 #include <time.h>
 
-#define MaxDim  4
+#define MaxDim 4
 #define qnt_vertices 4
 
 // ------ STRUCTS ------
@@ -47,7 +49,7 @@ struct Aresta {
 
 // ----- PROTOTIPOS ------
 
-int encontrar_raiz_grupo(struct Grupo grupos[qnt_vertices], int i);
+int encontrar_raiz_grupo(struct Grupo grupos[MaxDim], int i);
 
 void unir_grupos(struct Grupo grupos[], int x, int y);
 
@@ -56,17 +58,24 @@ int boruvka();
 // ----- GLOBAIS ------
 
 // Matriz adjacencia MaxDim x MaxDim
-int matriz_adjacencia[MaxDim][MaxDim] =  { { 0, 10,  6,  5},
+int matriz_adjacencia[MaxDim][MaxDim] =  {
+            { 0, 10,  6,  5},
             {10,  0,  0, 15},
             { 6,  0,  0,  4},
             { 5, 15,  4,  0}
   };
 
+
 // Variável que guarda o máximo de arestas possíveis
 int qnt_arestas = MaxDim * MaxDim;
 
 // Criando a AGM que guardará a resposta
-    struct Aresta resposta[MaxDim];
+struct Aresta resposta[MaxDim];
+
+// Variável auxiliar para somente executar o algoritmo apos a leitura da matriz
+int feito = 1;
+
+int tamanho_matriz = MaxDim;
 
 //----------------------
 
@@ -84,7 +93,7 @@ int qnt_arestas = MaxDim * MaxDim;
   resposta: vetor de struct Aresta de tamanho MaxDim que guardará a resposta da AGM
 */
 int boruvka() {
-    
+
     // Inicializacao de variaveis auxiliares
     int menores_distancias_vertices[qnt_vertices];
     struct Aresta arestas[qnt_arestas];
@@ -95,7 +104,7 @@ int boruvka() {
     // Contador de iterações aceitáveis - Evitando loop infinito em grafos desconectos
     int iteracoes = 0;
     // Quantidade de grupos atuais, inicia com o número de vertices pois todos os vertices na primeira iteração são grupos individuais
-    int qnt_grupos = MaxDim;
+    int qnt_grupos = tamanho_matriz;
     // Somador do peso da AGM
     int agm_peso = 0;
     // Guarda a quantidade de arestas presentes no grafo
@@ -105,7 +114,7 @@ int boruvka() {
     int i, j;
 
     // Procura todas as arestas da matriz de adjacencia e salva no array
-    for (i = 0; i < MaxDim; i++) {
+    for (i = 0; i < tamanho_matriz; i++) {
         // j <= i , pois temos um grafo simetrico
         for (j = 0; j <= i; j++) {
             if (matriz_adjacencia[i][j]) {
@@ -119,9 +128,8 @@ int boruvka() {
         }
     }
 
-
     // Inicializa todos os grupos e seta a menor distancia deles como -1
-    for (i = 0; i < MaxDim; ++i) {
+    for (i = 0; i < tamanho_matriz; ++i) {
         struct Grupo grupo;
         grupo.nivel = 0;
         grupo.pai = i;
@@ -131,17 +139,16 @@ int boruvka() {
     // Enquanto houver mais de um grupo de arestas
     while (qnt_grupos > 1) {
         // Verifica se o número de iterações é igual ao vertice, o que segnifica que o AGM não será mais encontrada.
-        if (iteracoes == MaxDim) {
+        if (iteracoes == tamanho_matriz) {
             return -1;
         } else {
             iteracoes++;
         }
 
         // Seta todas as os vertices com menores distancias como -1
-        for (i = 0; i < MaxDim; i++) {
+        for (i = 0; i < tamanho_matriz; i++) {
             menores_distancias_vertices[i] = -1;
         }
-
 
         for (i = 0; i < qnt_arestas_aux; i++) {
 
@@ -163,8 +170,7 @@ int boruvka() {
             }
         }
 
-
-        for (i = 0; i < MaxDim; i++) {
+        for (i = 0; i < tamanho_matriz; i++) {
             // Checa se a menor distacia do grupo ja existe
             if (menores_distancias_vertices[i] != -1) {
                 int raiz_grupo1 = encontrar_raiz_grupo(grupos, arestas[menores_distancias_vertices[i]].origem);
@@ -179,7 +185,7 @@ int boruvka() {
 
                 // Salva aresta encontrada na resposta
                 struct Aresta aresta;
-                
+
                 aresta.origem = arestas[menores_distancias_vertices[i]].origem;
                 aresta.destino = arestas[menores_distancias_vertices[i]].destino;
                 aresta.peso = arestas[menores_distancias_vertices[i]].peso;
@@ -223,7 +229,6 @@ void unir_grupos(struct Grupo grupos[], int x, int y) {
     int raiz_grupo_x = encontrar_raiz_grupo(grupos, x);
     int raiz_grupo_y = encontrar_raiz_grupo(grupos, y);
 
-
     if (grupos[raiz_grupo_x].nivel < grupos[raiz_grupo_y].nivel)
         grupos[raiz_grupo_x].pai = raiz_grupo_y;
 
@@ -237,35 +242,57 @@ void unir_grupos(struct Grupo grupos[], int x, int y) {
     }
 }
 
-
 // Funcao utilitaria para printar a matriz de adjacencia do grafo
-void printar_grafo(int n, int grafo[MaxDim][MaxDim])
-{
-    int i,j;
-     Serial.println("\nGRAFO: Matriz de Adjacencia\n");
-    for(i=0; i<n; i++)
-    {
-        for(j=0; j<n; j++)
-        {
-             Serial.print(grafo[i][j]);
-             Serial.print(" ");
+void printar_grafo(int n, int grafo[MaxDim][MaxDim]) {
+    int i, j;
+    Serial.println("\n\nGRAFO: Matriz de Adjacencia\n");
+    for (i = 0; i < n; i++) {
+        for (j = 0; j < n; j++) {
+            Serial.print(grafo[i][j]);
+            Serial.print(" ");
         }
-         Serial.println("\n");
+        Serial.println("\n");
     }
-     Serial.println("\n");
+    Serial.println("\n");
 }
 
-int feito = 0;
+void lerMatriz() {
+    Serial.println("Digite todos os items da matriz separados por quebra de linha");
+    int i, j, item;
+    int values[MaxDim * MaxDim];
+    int qntLidos = 0;
+
+    // Limpa o buffer da serial
+    while (Serial.available()) Serial.read();
+
+    while (1) {
+
+        if (qntLidos == MaxDim * MaxDim) {
+            break;
+        }
+        if (Serial.available() > 0) {
+            item = Serial.parseInt();
+            values[qntLidos++] = item;
+            Serial.print(".");
+        }
+    }
+
+    for (i = 0; i < MaxDim; i++) {
+        for (j = 0; j < MaxDim; j++) {
+            matriz_adjacencia[i][j] = values[(MaxDim * i) + j];
+        }
+    }
+    Serial.println("A leitura da matriz foi finalizada\n");
+
+    feito = 0;
+}
 
 void setup() {
-  // put your setup code here, to run once:
-   Serial.begin(9600); // opens serial port, sets data rate to 9600 bps
-
-   Serial.println("Teste");
+    Serial.begin(9600);
 }
 
 void loop() {
-   //
+    //
     // Testes de checagem do algoritmo boruvka
     // USO: Descomente o teste desejado e deixe comentado os que não serão utilizados
     //
@@ -287,104 +314,107 @@ void loop() {
    // };
 
     /*  Teste 2   */
-//        int vertices = 9;
-//        int matriz_adjacencia2[MaxDim][MaxDim] = {
-//                {0, 4,  0, 0,  0,  0,  0, 8,  0},
-//                {4, 0,  8, 0,  0,  0,  0, 11, 0},
-//                {0, 8,  0, 7,  0,  4,  0, 0,  2},
-//                {0, 0,  7, 0,  9,  14, 0, 0,  0},
-//                {0, 0,  0, 9,  0,  10, 0, 0,  0},
-//                {0, 0,  4, 14, 10, 0,  2, 0,  0},
-//                {0, 0,  0, 0,  0,  2,  0, 1,  6},
-//                {8, 11, 0, 0,  0,  0,  1, 0,  7},
-//                {0, 0,  2, 0,  0,  0,  6, 7,  0}
-//        };
+    //        int vertices = 9;
+    //        int matriz_adjacencia2[MaxDim][MaxDim] = {
+    //                {0, 4,  0, 0,  0,  0,  0, 8,  0},
+    //                {4, 0,  8, 0,  0,  0,  0, 11, 0},
+    //                {0, 8,  0, 7,  0,  4,  0, 0,  2},
+    //                {0, 0,  7, 0,  9,  14, 0, 0,  0},
+    //                {0, 0,  0, 9,  0,  10, 0, 0,  0},
+    //                {0, 0,  4, 14, 10, 0,  2, 0,  0},
+    //                {0, 0,  0, 0,  0,  2,  0, 1,  6},
+    //                {8, 11, 0, 0,  0,  0,  1, 0,  7},
+    //                {0, 0,  2, 0,  0,  0,  6, 7,  0}
+    //        };
 
     /*  Teste 3  */
-//    int vertices = 20;
-//    int matriz_adjacencia2[MaxDim][MaxDim] = {
-//            {0,  0, 15, 0,  0,  4,  0,  0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  11, 0},
-//            {0,  0, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  6,  0,  0, 0,  0,  4,  0,  0},
-//            {15, 0, 0,  0,  0,  0,  0,  5,  0,  33, 0,  0,  0,  0,  0, 0,  0,  0,  0,  2},
-//            {0,  0, 0,  0,  0,  0,  0,  0,  55, 12, 0,  0,  0,  0,  0, 0,  9,  0,  0,  0},
-//            {0,  0, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  25, 0,  0, 0,  0,  0,  0,  0},
-//            {4,  0, 0,  0,  0,  0,  0,  0,  0,  0,  16, 0,  0,  0,  0, 0,  0,  0,  0,  0},
-//            {0,  0, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  10, 0, 0,  0,  0,  8,  0},
-//            {0,  0, 5,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  3, 0,  37, 0,  0,  0},
-//            {0,  0, 0,  55, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  0,  0},
-//            {0,  0, 33, 12, 0,  0,  0,  0,  0,  0,  15, 0,  0,  0,  0, 0,  0,  0,  0,  0},
-//            {0,  0, 0,  0,  0,  16, 0,  0,  0,  15, 0,  0,  0,  0,  0, 0,  0,  0,  0,  0},
-//            {0,  0, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  60, 0,  0, 0,  0,  0,  0,  0},
-//            {0,  6, 0,  0,  25, 0,  0,  0,  0,  0,  0,  60, 0,  0,  0, 0,  0,  0,  0,  0},
-//            {0,  0, 0,  0,  0,  0,  10, 0,  0,  0,  0,  0,  0,  0,  0, 13, 0,  0,  0,  0},
-//            {0,  0, 0,  0,  0,  0,  0,  3,  0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  0,  0},
-//            {0,  0, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  13, 0, 0,  0,  0,  0,  0},
-//            {0,  0, 0,  9,  0,  0,  0,  37, 0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  0,  0},
-//            {0,  4, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  0,  20},
-//            {11, 0, 0,  0,  0,  0,  8,  0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  0,  0},
-//            {0,  0, 2,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  20, 0,  0},
-//    };
+    //    int vertices = 20;
+    //    int matriz_adjacencia2[MaxDim][MaxDim] = {
+    //            {0,  0, 15, 0,  0,  4,  0,  0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  11, 0},
+    //            {0,  0, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  6,  0,  0, 0,  0,  4,  0,  0},
+    //            {15, 0, 0,  0,  0,  0,  0,  5,  0,  33, 0,  0,  0,  0,  0, 0,  0,  0,  0,  2},
+    //            {0,  0, 0,  0,  0,  0,  0,  0,  55, 12, 0,  0,  0,  0,  0, 0,  9,  0,  0,  0},
+    //            {0,  0, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  25, 0,  0, 0,  0,  0,  0,  0},
+    //            {4,  0, 0,  0,  0,  0,  0,  0,  0,  0,  16, 0,  0,  0,  0, 0,  0,  0,  0,  0},
+    //            {0,  0, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  10, 0, 0,  0,  0,  8,  0},
+    //            {0,  0, 5,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  3, 0,  37, 0,  0,  0},
+    //            {0,  0, 0,  55, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  0,  0},
+    //            {0,  0, 33, 12, 0,  0,  0,  0,  0,  0,  15, 0,  0,  0,  0, 0,  0,  0,  0,  0},
+    //            {0,  0, 0,  0,  0,  16, 0,  0,  0,  15, 0,  0,  0,  0,  0, 0,  0,  0,  0,  0},
+    //            {0,  0, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  60, 0,  0, 0,  0,  0,  0,  0},
+    //            {0,  6, 0,  0,  25, 0,  0,  0,  0,  0,  0,  60, 0,  0,  0, 0,  0,  0,  0,  0},
+    //            {0,  0, 0,  0,  0,  0,  10, 0,  0,  0,  0,  0,  0,  0,  0, 13, 0,  0,  0,  0},
+    //            {0,  0, 0,  0,  0,  0,  0,  3,  0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  0,  0},
+    //            {0,  0, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  13, 0, 0,  0,  0,  0,  0},
+    //            {0,  0, 0,  9,  0,  0,  0,  37, 0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  0,  0},
+    //            {0,  4, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  0,  20},
+    //            {11, 0, 0,  0,  0,  0,  8,  0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  0,  0,  0},
+    //            {0,  0, 2,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  20, 0,  0},
+    //    };
 
-  if (!feito) {
-    // Exibindo a grafo (Matriz de adjacencia)
-    printar_grafo(MaxDim, matriz_adjacencia);
+    // Le a matriz da serial com o tamanho MaxDim * MaxDim
+    lerMatriz();
 
-    // Iniciando o Boruvka
-     Serial.println("<Boruvka> \n\n");
+    if (!feito) {
+        // Exibindo a grafo (Matriz de adjacencia)
+        printar_grafo(tamanho_matriz, matriz_adjacencia);
 
-    // Rodando o algoritimo
-    int agm_peso = boruvka();
+        // Iniciando o Boruvka
+        Serial.println("<Boruvka> \n\n");
 
-    // Ocorreu um erro ao procurar AGM
-    if (agm_peso == -1) {
-         Serial.println("Erro ao procurar AGM\n");
-        return 0;
+        // Rodando o algoritimo
+        int agm_peso = boruvka();
+
+        // Ocorreu um erro ao procurar AGM
+        if (agm_peso == -1) {
+            Serial.println("Erro ao procurar AGM\n");
+            return;
+        }
+
+        //    // Checando os valores obtidos por meio do peso da agm (previamente conhecido)
+        //    switch (MaxDim) {
+        //        case 4:
+        //            if (agm_peso != 19) {
+        //                 Serial.println("Erro ao procurar AGM\n");
+        //                return;
+        //            }
+        //            break;
+        //        case 9:
+        //            if (agm_peso != 37) {
+        //                 Serial.println("Erro ao procurar AGM\n");
+        //                return;
+        //            }
+        //            break;
+        //        case 20:
+        //            if (agm_peso != 293) {
+        //                 Serial.println("Erro ao procurar AGM\n");
+        //                return;
+        //            }
+        //            break;
+        //        case 45:
+        //            if (agm_peso != 2212) {
+        //                 Serial.println("Erro ao procurar AGM\n");
+        //                return;
+        //            }
+        //            break;
+        //        default:
+        //            break;
+        //    }
+
+        // Exibindo o valores encontrados
+        Serial.println("AGM:\n");
+        for (int v = 0; v < MaxDim - 1; ++v) {
+            Serial.print(resposta[v].origem);
+            Serial.print(" --> ");
+            Serial.print(resposta[v].destino);
+            Serial.print(" | Peso: ");
+            Serial.println(resposta[v].peso);
+        }
+
+        Serial.print("\nO Peso da AGM eh: ");
+        Serial.println(agm_peso);
+
+        feito = 1;
     }
-
-    // Checando os valores obtidos por meio do peso da agm (previamente conhecido)
-    switch (MaxDim) {
-        case 4:
-            if (agm_peso != 19) {
-                 Serial.println("Erro ao procurar AGM\n");
-                return 0;
-            }
-            break;
-        case 9:
-            if (agm_peso != 37) {
-                 Serial.println("Erro ao procurar AGM\n");
-                return 0;
-            }
-            break;
-        case 20:
-            if (agm_peso != 293) {
-                 Serial.println("Erro ao procurar AGM\n");
-                return 0;
-            }
-            break;
-        case 45:
-            if (agm_peso != 2212) {
-                 Serial.println("Erro ao procurar AGM\n");
-                return 0;
-            }
-            break;
-        default:
-            break;
-    }
-
-    // Exibindo o valores encontrados
-     Serial.println("AGM:\n");
-    for (int v = 0; v < MaxDim - 1; ++v) {
-         Serial.print(resposta[v].origem);
-         Serial.print(" --> ");
-         Serial.print(resposta[v].destino);
-         Serial.print(" | Peso: ");
-         Serial.println(resposta[v].peso);
-    }
-
-     Serial.println("\nO Peso da AGM eh: %d \n");
-     Serial.println(agm_peso);
-
-     feito = 1;
-  }
-    return (0);
+    return;
 }
