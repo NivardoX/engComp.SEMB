@@ -29,14 +29,8 @@
 // Target Platform: Linux
 //
 
-#include <stdlib.h>
-
-#include <stdio.h>
-
-#include <time.h>
-
-#define MaxDim 10
-#define qnt_vertices 10
+#define MaxDim 15
+#define qnt_vertices 15
 
 // ------ STRUCTS ------
 struct Grupo {
@@ -49,28 +43,24 @@ struct Aresta {
 
 // ----- PROTOTIPOS ------
 
-int encontrar_raiz_grupo(struct Grupo grupos[MaxDim], int i);
+int encontrar_raiz_grupo(int i);
 
-void unir_grupos(struct Grupo grupos[], int x, int y);
+void unir_grupos(int x, int y);
+
+int qnt_lidos = 0;
 
 int boruvka();
 
 // ----- GLOBAIS ------
 
-// Matriz adjacencia MaxDim x MaxDim
-int matriz_adjacencia[MaxDim][MaxDim] =  {
-            { 0, 10,  6,  5},
-            {10,  0,  0, 15},
-            { 6,  0,  0,  4},
-            { 5, 15,  4,  0}
-  };
-
 
 // Variável que guarda o máximo de arestas possíveis
 int qnt_arestas = MaxDim * MaxDim;
 
-// Criando a AGM que guardará a resposta
-struct Aresta resposta[MaxDim];
+// Inicializacao de variaveis auxiliares
+int menores_distancias_vertices[qnt_vertices];
+struct Aresta arestas[MaxDim * MaxDim];
+struct Grupo grupos[qnt_vertices];
 
 // Variável auxiliar para somente executar o algoritmo apos a leitura da matriz
 int feito = 1;
@@ -94,11 +84,6 @@ int tamanho_matriz = MaxDim;
 */
 int boruvka() {
 
-    // Inicializacao de variaveis auxiliares
-    int menores_distancias_vertices[qnt_vertices];
-    struct Aresta arestas[qnt_arestas];
-    struct Grupo grupos[qnt_vertices];
-
     // Guarda o index da proxima aresta a ser adicionada na AGM resposta
     int resp_index = 0;
     // Contador de iterações aceitáveis - Evitando loop infinito em grafos desconectos
@@ -113,21 +98,6 @@ int boruvka() {
     // Auxiliares nos loops
     int i, j;
 
-    // Procura todas as arestas da matriz de adjacencia e salva no array
-    for (i = 0; i < tamanho_matriz; i++) {
-        // j <= i , pois temos um grafo simetrico
-        for (j = 0; j <= i; j++) {
-            if (matriz_adjacencia[i][j]) {
-                struct Aresta aresta;
-                aresta.origem = i;
-                aresta.destino = j;
-                aresta.peso = matriz_adjacencia[i][j];
-
-                arestas[qnt_arestas_aux++] = aresta;
-            }
-        }
-    }
-
     // Inicializa todos os grupos e seta a menor distancia deles como -1
     for (i = 0; i < tamanho_matriz; ++i) {
         struct Grupo grupo;
@@ -136,7 +106,15 @@ int boruvka() {
         grupos[i] = grupo;
     }
 
+    // Remove arestas nulas
+    for (i = 0; i < tamanho_matriz * tamanho_matriz; ++i) {
+        if (arestas[i].peso) {
+          arestas[qnt_arestas_aux++] = arestas[i];
+        }
+    }
+
     // Enquanto houver mais de um grupo de arestas
+    Serial.println(F("AGM:\n"));
     while (qnt_grupos > 1) {
         // Verifica se o número de iterações é igual ao vertice, o que segnifica que o AGM não será mais encontrada.
         if (iteracoes == tamanho_matriz) {
@@ -152,8 +130,8 @@ int boruvka() {
 
         for (i = 0; i < qnt_arestas_aux; i++) {
 
-            int raiz_grupo1 = encontrar_raiz_grupo(grupos, arestas[i].origem);
-            int raiz_grupo2 = encontrar_raiz_grupo(grupos, arestas[i].destino);
+            int raiz_grupo1 = encontrar_raiz_grupo(arestas[i].origem);
+            int raiz_grupo2 = encontrar_raiz_grupo(arestas[i].destino);
 
             if (raiz_grupo1 == raiz_grupo2)
                 continue;
@@ -173,8 +151,8 @@ int boruvka() {
         for (i = 0; i < tamanho_matriz; i++) {
             // Checa se a menor distacia do grupo ja existe
             if (menores_distancias_vertices[i] != -1) {
-                int raiz_grupo1 = encontrar_raiz_grupo(grupos, arestas[menores_distancias_vertices[i]].origem);
-                int raiz_grupo2 = encontrar_raiz_grupo(grupos, arestas[menores_distancias_vertices[i]].destino);
+                int raiz_grupo1 = encontrar_raiz_grupo(arestas[menores_distancias_vertices[i]].origem);
+                int raiz_grupo2 = encontrar_raiz_grupo(arestas[menores_distancias_vertices[i]].destino);
 
                 // Está no mesmo subgrafo, não precisa fazer nada
                 if (raiz_grupo1 == raiz_grupo2)
@@ -183,17 +161,15 @@ int boruvka() {
                 // Adiciona peso da aresta encontrada no peso da AGM
                 agm_peso += arestas[menores_distancias_vertices[i]].peso;
 
-                // Salva aresta encontrada na resposta
-                struct Aresta aresta;
-
-                aresta.origem = arestas[menores_distancias_vertices[i]].origem;
-                aresta.destino = arestas[menores_distancias_vertices[i]].destino;
-                aresta.peso = arestas[menores_distancias_vertices[i]].peso;
-
-                resposta[resp_index++] = aresta;
+                // Mostra aresta encontrada
+                Serial.print( arestas[menores_distancias_vertices[i]].origem);
+                Serial.print(F(" --> "));
+                Serial.print(arestas[menores_distancias_vertices[i]].destino);
+                Serial.print(F(" | Peso: "));
+                Serial.println(arestas[menores_distancias_vertices[i]].peso);
 
                 // Une os grupos 1 e 2 e diminui a quantidade de grupos
-                unir_grupos(grupos, raiz_grupo1, raiz_grupo2);
+                unir_grupos(raiz_grupo1, raiz_grupo2);
                 qnt_grupos--;
             }
         }
@@ -204,7 +180,7 @@ int boruvka() {
 }
 
 // Funcao para realizar um Find em um grupo(arvore), ela encontra a raiz da arvore
-int encontrar_raiz_grupo(struct Grupo grupos[qnt_vertices], int i) {
+int encontrar_raiz_grupo(int i) {
 
     int lista_aux[qnt_vertices];
     int index = 0;
@@ -224,10 +200,10 @@ int encontrar_raiz_grupo(struct Grupo grupos[qnt_vertices], int i) {
 }
 
 // Funcao utilitaria para realizar uma Union em dois grupos(arvores), ela eh feita por nivel
-void unir_grupos(struct Grupo grupos[], int x, int y) {
+void unir_grupos(int x, int y) {
 
-    int raiz_grupo_x = encontrar_raiz_grupo(grupos, x);
-    int raiz_grupo_y = encontrar_raiz_grupo(grupos, y);
+    int raiz_grupo_x = encontrar_raiz_grupo(x);
+    int raiz_grupo_y = encontrar_raiz_grupo(y);
 
     if (grupos[raiz_grupo_x].nivel < grupos[raiz_grupo_y].nivel)
         grupos[raiz_grupo_x].pai = raiz_grupo_y;
@@ -243,34 +219,33 @@ void unir_grupos(struct Grupo grupos[], int x, int y) {
 }
 
 // Funcao utilitaria para printar a matriz de adjacencia do grafo
-void printar_grafo(int n, int grafo[MaxDim][MaxDim]) {
+void printar_grafo() {
     int i, j;
     Serial.println("\n\nGRAFO: Matriz de Adjacencia\n");
-    for (i = 0; i < n; i++) {
-        for (j = 0; j < n; j++) {
-            Serial.print(grafo[i][j]);
-            Serial.print(" ");
+    for (i = 0; i < tamanho_matriz; i++) {
+        for (j = 0; j < tamanho_matriz; j++) {
+            Serial.print(arestas[(i * tamanho_matriz) + j].peso);
+            Serial.print(F(" "));
         }
-        Serial.println("\n");
+        Serial.println(F("\n"));
     }
-    Serial.println("\n");
+    Serial.println(F("\n"));
 }
 
 void lerMatriz() {
 
     int i, j, item, ordem_matriz;
-    int values[MaxDim * MaxDim] = {0};
-    int qnt_lidos = 0;
-    
+    qnt_lidos = 0;
+
    // Limpa o buffer da serial
     while (Serial.available()) Serial.read();
 
-    Serial.println("Digite a ordem da matriz");
+    Serial.println(F("Digite a ordem da matriz"));
     while(!Serial.available());
     ordem_matriz = Serial.parseInt();
 
     while (Serial.available()) Serial.read();
-    Serial.println("Digite todos os items da matriz separados por quebra de linha");
+    Serial.println(F("Digite todos os items da matriz separados por quebra de linha"));
 
 
     while (1) {
@@ -279,17 +254,24 @@ void lerMatriz() {
         }
         if (Serial.available() > 0) {
             item = Serial.parseInt();
-            values[qnt_lidos++] = item;
-            Serial.print(".");
+            struct Aresta aresta;
+            aresta.origem = qnt_lidos/ordem_matriz;
+            aresta.destino = qnt_lidos % ordem_matriz;
+            aresta.peso = item;
+
+            arestas[qnt_lidos] = aresta;
+            Serial.print(F("Lido: "));
+            Serial.println(item);
+            Serial.print(F("Colocado em: ["));
+            Serial.print(qnt_lidos/ordem_matriz);
+            Serial.print(F("]["));
+            Serial.print(qnt_lidos % ordem_matriz);
+            Serial.println(F("]"));
+            qnt_lidos++;
         }
     }
 
-    for (i = 0; i < ordem_matriz; i++) {
-        for (j = 0; j < ordem_matriz; j++) {
-            matriz_adjacencia[i][j] = values[(ordem_matriz * i) + j];
-        }
-    }
-    Serial.println("A leitura da matriz foi finalizada\n");
+    Serial.println(F("A leitura da matriz foi finalizada\n"));
 
     feito = 0;
     tamanho_matriz = ordem_matriz;
@@ -312,7 +294,7 @@ void loop() {
       6 |   5\   |15
         |      \ |
         2--------3
-   //          4           
+   //          4
    // int vertices = 4;
    // int matriz_adjacencia2[MaxDim][MaxDim] = {
    //         { 0, 10,  6,  5},
@@ -365,17 +347,17 @@ void loop() {
 
     if (!feito) {
         // Exibindo a grafo (Matriz de adjacencia)
-        printar_grafo(tamanho_matriz, matriz_adjacencia);
+        printar_grafo();
 
         // Iniciando o Boruvka
-        Serial.println("<Boruvka> \n\n");
+        Serial.println(F("<Boruvka> \n\n"));
 
         // Rodando o algoritimo
         int agm_peso = boruvka();
 
         // Ocorreu um erro ao procurar AGM
         if (agm_peso == -1) {
-            Serial.println("Erro ao procurar AGM\n");
+            Serial.println(F("Erro ao procurar AGM\n"));
             return;
         }
 
@@ -409,17 +391,7 @@ void loop() {
         //            break;
         //    }
 
-        // Exibindo o valores encontrados
-        Serial.println("AGM:\n");
-        for (int v = 0; v < tamanho_matriz - 1; ++v) {
-            Serial.print(resposta[v].origem);
-            Serial.print(" --> ");
-            Serial.print(resposta[v].destino);
-            Serial.print(" | Peso: ");
-            Serial.println(resposta[v].peso);
-        }
-
-        Serial.print("\nO Peso da AGM eh: ");
+        Serial.print(F("\nO Peso da AGM eh: "));
         Serial.println(agm_peso);
 
         feito = 1;
