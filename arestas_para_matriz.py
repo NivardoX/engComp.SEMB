@@ -61,11 +61,21 @@ class Aresta():
     destino: int
     peso: int
 
-def printar_matriz(matriz):
+def printar_matriz(matriz,arquivo=True):
+    if arquivo:
+        with open("matriz_adjacencia.txt", 'w') as f:
+            for col in range(ordem):
+                for lac in range(ordem):
+                    f.write(str(matriz[col][lac]))
+                    f.write('\t')
+                f.write('\n')
+
     for col in range(ordem):
         for lac in range(ordem):
             print(matriz[col][lac],end='\t')
         print()
+
+
 
 if __name__ == '__main__':
     lista_arestas = eval(raw_arestas.replace('\n', '').replace('{', '[').replace('}', ']').strip())
