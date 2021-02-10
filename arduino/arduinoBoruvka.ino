@@ -3,7 +3,7 @@
  *  Algoritmo de BORUVKA
  *  __________________
  *
- * Copyright 2020 Nivardo Alburquerque, Paulo Bernardo
+ * Copyright 2021 Nivardo Alburquerque, Paulo Bernardo
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in the
@@ -24,9 +24,9 @@
  */
 
 //
-// Created for a college projetct
+// Created for a college project
 // Course: Sistemas Embarcados @ IFCE - Instituto Federal de Educação, Ciência e Tecnologia do Ceará
-// Target Platform: Linux
+// Target Platform: Arduino Uno
 //
 
 #define MaxDim 45
@@ -46,8 +46,6 @@ struct Aresta {
 int encontrar_raiz_grupo(int i);
 
 void unir_grupos(int x, int y);
-
-int qnt_lidos = 0;
 
 int boruvka();
 
@@ -84,7 +82,6 @@ struct Grupo grupos[qnt_vertices];
 //{2, 0, 6}, {2, 1, 0}, {2, 2, 0}, {2, 3, 4},
 //{3, 0, 5}, {3, 1, 15}, {3, 2, 4}, {3, 3, 0}
 //};
-//
 //
 //int tamanho_matriz = 4;
 
@@ -182,39 +179,29 @@ const PROGMEM Aresta arestas[] = {
 int tamanho_matriz = 45;
 
 
-
-// Guarda a quantidade de arestas presentes no grafo
-int qnt_arestas_aux = tamanho_matriz * tamanho_matriz;
-
-
-// Variável auxiliar para somente executar o algoritmo apos a leitura da matriz
+// Variável auxiliar para somente executar o algoritmo uma vez
+// Pode ser ajustada para executar apenas após a leitura
 int feito = 0;
 
 //----------------------
 
 /*
-  Recebe a quantidade de vertices, o grafo e a AGM vazia que será a resposta.
-  O algoritmo verifica se o número de vertices é igual ou menor que a quantidade
-  máxima possível, caso não, retorna -1. Que significa  que não foi possivel encontar
-  a AGM.
-  Caso o grafo seja desconecto ou não tenha a AGM, o algoritmo retornará -1 também.
   O algoritmo procura a AGM e retorna o valor do peso da AGM e a resposta de forma impura.
+  Caso o grafo seja desconecto ou não tenha a AGM, o algoritmo retornará -1.
 
-  Parâmetros:
-  vertices: tipo inteiro que guarda a quantidade de vertices presentes no grafo
-  matriz_adjacencia_aux: matriz de inteiros MaxDim x MaxDim que representa o grafo
-  resposta: vetor de struct Aresta de tamanho MaxDim que guardará a resposta da AGM
+  Variáveis globais afetadas: arestas, tamanho_matriz.
 */
 int boruvka() {
 
-    // Guarda o index da proxima aresta a ser adicionada na AGM resposta
-    int resp_index = 0;
     // Contador de iterações aceitáveis - Evitando loop infinito em grafos desconectos
     int iteracoes = 0;
     // Quantidade de grupos atuais, inicia com o número de vertices pois todos os vertices na primeira iteração são grupos individuais
     int qnt_grupos = tamanho_matriz;
     // Somador do peso da AGM
     int agm_peso = 0;
+
+    // Guarda a quantidade de arestas presentes no grafo
+    int qnt_arestas_aux = tamanho_matriz * tamanho_matriz;
 
     // Auxiliares nos loops
     int i, j;
@@ -296,6 +283,7 @@ int boruvka() {
 }
 
 // Funcao para realizar um Find em um grupo(arvore), ela encontra a raiz da arvore
+// Variáveis globais afetadas: grupos, qnt_vertices.
 int encontrar_raiz_grupo(int i) {
 
     int lista_aux[qnt_vertices];
@@ -316,6 +304,7 @@ int encontrar_raiz_grupo(int i) {
 }
 
 // Funcao utilitaria para realizar uma Union em dois grupos(arvores), ela eh feita por nivel
+// Variáveis globais afetadas: grupos.
 void unir_grupos(int x, int y) {
 
     int raiz_grupo_x = encontrar_raiz_grupo(x);
@@ -337,7 +326,7 @@ void unir_grupos(int x, int y) {
 // Funcao utilitaria para printar a matriz de adjacencia do grafo
 void printar_grafo() {
     int i, j;
-    Serial.println("\n\nGRAFO: Matriz de Adjacencia\n");
+    Serial.println(F("\n\nGRAFO: Matriz de Adjacencia\n"));
     for (i = 0; i < tamanho_matriz; i++) {
         for (j = 0; j < tamanho_matriz; j++) {
             Serial.print(pgm_read_word(&(arestas[(i * tamanho_matriz) + j].peso)));
@@ -348,10 +337,12 @@ void printar_grafo() {
     Serial.println(F("\n"));
 }
 
+// Função que lia uma matriz pela serial
+// Para utilizá-la é preciso retirar o progmem e utilizar um array de arestas comum
 void lerMatriz() {
 
     int i, j, item, ordem_matriz;
-    qnt_lidos = 0;
+    int qnt_lidos = 0;
 
    // Limpa o buffer da serial
     while (Serial.available()) Serial.read();
@@ -360,34 +351,34 @@ void lerMatriz() {
     while(!Serial.available());
     ordem_matriz = Serial.parseInt();
 
-//    while (Serial.available()) Serial.read();
-//    Serial.println(F("Digite todos os items da matriz separados por quebra de linha"));
+    while (Serial.available()) Serial.read();
+    Serial.println(F("Digite todos os items da matriz separados por quebra de linha"));
 
 
-//    while (1) {
-//        if (qnt_lidos == ordem_matriz * ordem_matriz) {
-//            break;
-//        }
-//        if (Serial.available() > 0) {
-//            item = Serial.parseInt();
-//            struct Aresta aresta;
-//            aresta.origem = qnt_lidos/ordem_matriz;
-//            aresta.destino = qnt_lidos % ordem_matriz;
-//            aresta.peso = item;
-//
-//            arestas[qnt_lidos] = aresta;
-//            Serial.print(F("Lido: "));
-//            Serial.println(item);
-//            Serial.print(F("Colocado em: ["));
-//            Serial.print(qnt_lidos/ordem_matriz);
-//            Serial.print(F("]["));
-//            Serial.print(qnt_lidos % ordem_matriz);
-//            Serial.println(F("]"));
-//            qnt_lidos++;
-//        }
-//    }
+    while (1) {
+        if (qnt_lidos == ordem_matriz * ordem_matriz) {
+            break;
+        }
+        if (Serial.available() > 0) {
+            item = Serial.parseInt();
+            struct Aresta aresta;
+            aresta.origem = qnt_lidos/ordem_matriz;
+            aresta.destino = qnt_lidos % ordem_matriz;
+            aresta.peso = item;
 
-//    Serial.println(F("A leitura da matriz foi finalizada\n"));
+            arestas[qnt_lidos] = aresta;
+            Serial.print(F("Lido: "));
+            Serial.println(item);
+            Serial.print(F("Colocado em: ["));
+            Serial.print(qnt_lidos/ordem_matriz);
+            Serial.print(F("]["));
+            Serial.print(qnt_lidos % ordem_matriz);
+            Serial.println(F("]"));
+            qnt_lidos++;
+        }
+    }
+
+    Serial.println(F("A leitura da matriz foi finalizada\n"));
 
     feito = 0;
     tamanho_matriz = ordem_matriz;
@@ -415,38 +406,39 @@ void loop() {
         // Ocorreu um erro ao procurar AGM
         if (agm_peso == -1) {
             Serial.println(F("Erro ao procurar AGM\n"));
+            feito = 1;
             return;
         }
 
-        //    // Checando os valores obtidos por meio do peso da agm (previamente conhecido)
-        //    switch (MaxDim) {
-        //        case 4:
-        //            if (agm_peso != 19) {
-        //                 Serial.println("Erro ao procurar AGM\n");
-        //                return;
-        //            }
-        //            break;
-        //        case 9:
-        //            if (agm_peso != 37) {
-        //                 Serial.println("Erro ao procurar AGM\n");
-        //                return;
-        //            }
-        //            break;
-        //        case 20:
-        //            if (agm_peso != 293) {
-        //                 Serial.println("Erro ao procurar AGM\n");
-        //                return;
-        //            }
-        //            break;
-        //        case 45:
-        //            if (agm_peso != 2212) {
-        //                 Serial.println("Erro ao procurar AGM\n");
-        //                return;
-        //            }
-        //            break;
-        //        default:
-        //            break;
-        //    }
+        // Checando os valores obtidos por meio do peso da agm (previamente conhecido)
+        switch (tamanho_matriz) {
+            case 4:
+                if (agm_peso != 19) {
+                     Serial.println(F("Erro ao procurar AGM"));
+                    return;
+                }
+                break;
+            case 9:
+                if (agm_peso != 37) {
+                     Serial.println(F("Erro ao procurar AGM"));
+                    return;
+                }
+                break;
+            case 20:
+                if (agm_peso != 293) {
+                     Serial.println(F("Erro ao procurar AGM"));
+                    return;
+                }
+                break;
+            case 45:
+                if (agm_peso != 2212) {
+                     Serial.println(F("Erro ao procurar AGM"));
+                    return;
+                }
+                break;
+            default:
+                break;
+        }
 
         Serial.print(F("\nO Peso da AGM eh: "));
         Serial.println(agm_peso);

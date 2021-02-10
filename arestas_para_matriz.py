@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import TypedDict, List
+from typing import List
 
 ordem = 45
 raw_arestas = """
@@ -61,7 +61,8 @@ class Aresta():
     destino: int
     peso: int
 
-def printar_matriz(matriz,arquivo=True):
+
+def printar_matriz(matriz, arquivo=True):
     if arquivo:
         with open("matriz_adjacencia.txt", 'w') as f:
             for col in range(ordem):
@@ -72,8 +73,9 @@ def printar_matriz(matriz,arquivo=True):
 
     for col in range(ordem):
         for lac in range(ordem):
-            print(matriz[col][lac],end='\t')
+            print(matriz[col][lac], end='\t')
         print()
+
 
 
 
