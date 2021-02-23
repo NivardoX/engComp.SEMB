@@ -1,0 +1,30 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/nivardo/Projects/engcomp.SEMB/linux_nao_modificado/boruvka.h
+stdlib.h
+-
+stdio.h
+-
+time.h
+-
+unistd.h
+-
+
+/home/nivardo/Projects/engcomp.SEMB/linux_nao_modificado/testDriver.c
+stdio.h
+-
+boruvka.h
+/home/nivardo/Projects/engcomp.SEMB/linux_nao_modificado/boruvka.h
+utils.h
+/home/nivardo/Projects/engcomp.SEMB/linux_nao_modificado/utils.h
+time.h
+-
+
+/home/nivardo/Projects/engcomp.SEMB/linux_nao_modificado/utils.h
+

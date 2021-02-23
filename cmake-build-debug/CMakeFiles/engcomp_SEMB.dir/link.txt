@@ -1,0 +1,1 @@
+/usr/bin/cc -g   CMakeFiles/engcomp_SEMB.dir/arduino/arduinoBoruvka.c.o CMakeFiles/engcomp_SEMB.dir/linux_modificado/arduinoBoruvka.c.o CMakeFiles/engcomp_SEMB.dir/linux_nao_modificado/testDriver.c.o  -o engcomp_SEMB 

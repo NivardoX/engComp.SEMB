@@ -1,0 +1,1 @@
+/usr/bin/cc -g   CMakeFiles/linux_nao_modificado.dir/testDriver.c.o  -o linux_nao_modificado 
