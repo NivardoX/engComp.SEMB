@@ -168,9 +168,6 @@ int main() {
     t = clock() -t;
     float tempoCorrido = ((float)t)/CLOCKS_PER_SEC;
 
-    printf("Tempo corrido ao procurar AGM: %f s\n",tempoCorrido);
-
-
     // Ocorreu um erro ao procurar AGM
     if (agm_peso == -1) {
         printf("Erro ao procurar AGM\n");
@@ -214,6 +211,8 @@ int main() {
     }
 
     printf("\nO Peso da AGM eh: %d \n", agm_peso);
+
+    printf("Tempo corrido ao procurar AGM: %f s\n",tempoCorrido);
 
     return (0);
 }
